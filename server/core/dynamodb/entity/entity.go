@@ -2,7 +2,6 @@ package entity
 
 import (
 	"encoding/json"
-	"github.com/runatlantis/atlantis/server/events/models"
 )
 
 type Kind int8
@@ -17,18 +16,19 @@ type Entity struct {
 	Object string
 }
 
-func ToModel[T any](entity Entity) T {
-	var obj T
-	_ = json.Unmarshal([]byte(entity.Object), &obj)
+func ToObject[T any](entity Entity) T {
+	var object T
+	_ = json.Unmarshal([]byte(entity.Object), &object)
 
-	return obj
+	return object
 }
 
-func NewFromProjectLock(lock models.ProjectLock) Entity {
-	object, _ := json.Marshal(lock)
+func NewFromObject[T any](kind Kind, uid string, object T) Entity {
+	marshaled, _ := json.Marshal(object)
 
 	return Entity{
-		Pk:     ELock,
-		Object: string(object),
+		Pk:     kind,
+		Sk:     uid,
+		Object: string(marshaled),
 	}
 }
