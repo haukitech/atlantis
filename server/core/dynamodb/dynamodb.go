@@ -22,6 +22,10 @@ import (
 type DynamoDb struct {
 }
 
+func New() *DynamoDb {
+	return &DynamoDb{}
+}
+
 func (d DynamoDb) TryLock(lock models.ProjectLock) (bool, models.ProjectLock, error) {
 	//TODO implement me
 	panic("implement me")

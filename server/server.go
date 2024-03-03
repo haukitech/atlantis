@@ -21,6 +21,7 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"github.com/runatlantis/atlantis/server/core/dynamodb"
 	"io"
 	"log"
 	"net/http"
@@ -441,6 +442,9 @@ func NewServer(userConfig UserConfig, config Config) (*Server, error) {
 		if err != nil {
 			return nil, err
 		}
+	case "dynamodb":
+		logger.Info("Utilizing DynamoDB")
+		backend = dynamodb.New()
 	case "boltdb":
 		logger.Info("Utilizing BoltDB")
 		backend, err = db.New(userConfig.DataDir)

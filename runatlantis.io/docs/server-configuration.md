@@ -405,6 +405,14 @@ and set `--autoplan-modules` to `false`.
   ```
   Stops atlantis from unlocking a pull request with this label. Defaults to "" (feature disabled).
 
+### `--dynamodb-table`
+  ```bash
+  atlantis server --dynamodb-table=atlantis
+  # or
+  ATLANTIS_DYNAMODB_TABLE=atlantis
+  ```
+The DynamoDB table for when using a Locking DB type of `dynamodb`.
+
 ### `--emoji-reaction`
   ```bash
   atlantis server --emoji-reaction thumbsup
@@ -672,15 +680,16 @@ This is useful when you have many projects and want to keep the pull request cle
 
 ### `--locking-db-type`
   ```bash
-  atlantis server --locking-db-type="<boltdb|redis>"
+  atlantis server --locking-db-type="<boltdb|redis|dynamodb>"
   # or
-  ATLANTIS_LOCKING_DB_TYPE="<boltdb|redis>"
+  ATLANTIS_LOCKING_DB_TYPE="<boltdb|redis|dynamodb>"
   ```
   The locking database type to use for storing plan and apply locks. Defaults to `boltdb`.
 
   Notes:
   * If set to `boltdb`, only one process may have access to the boltdb instance.
   * If set to `redis`, then `--redis-host`, `--redis-port`, and `--redis-password` must be set.
+  * If set to `dynamodb`, then `--dynamodb-table` must be set.
 
 ### `--log-level`
   ```bash
