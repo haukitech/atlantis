@@ -216,13 +216,24 @@ This flag overrides `--autoplan-modules`. If you wish to disable auto-planning o
 and set `--autoplan-modules` to `false`.
 :::
 
+### `--aws-custom-endpoint`
+  ```bash
+  atlantis server --aws-custom-endpoint http://localhost:4566"
+  # or
+  ATLANTIS_AWS_CUSTOM_ENDPOINT="http://localhost:4566"
+  ```
+The custom endpoint for AWS API, e.g., for storing locks in DynamoDB. This configuration option is useful
+in particular for testing Atlantis with LocalStack.
+
+This option does not affect terraform execution.
+
 ### `--azuredevops-hostname`
   ```bash
   atlantis server --azuredevops-hostname="dev.azure.com"
   # or
   ATLANTIS_AZUREDEVOPS_HOSTNAME="dev.azure.com"
   ```
-  Azure DevOps hostname to support cloud and self hosted instances. Defaults to `dev.azure.com`.
+  Azure DevOps hostname to support cloud and self-hosted instances. Defaults to `dev.azure.com`.
 
 ### `--azuredevops-token`
   ```bash
@@ -409,7 +420,7 @@ and set `--autoplan-modules` to `false`.
   ```bash
   atlantis server --dynamodb-table=atlantis
   # or
-  ATLANTIS_DYNAMODB_TABLE=atlantis
+  ATLANTIS_DYNAMODB_TABLE="atlantis"
   ```
 The DynamoDB table for when using a Locking DB type of `dynamodb`.
 

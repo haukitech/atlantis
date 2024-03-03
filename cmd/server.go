@@ -53,6 +53,7 @@ const (
 	AtlantisURLFlag                  = "atlantis-url"
 	AutoDiscoverModeFlag             = "autodiscover-mode"
 	AutomergeFlag                    = "automerge"
+	AWSCustomEndpoint                = "aws-custom-endpoint"
 	ParallelPlanFlag                 = "parallel-plan"
 	ParallelApplyFlag                = "parallel-apply"
 	AutoplanModules                  = "autoplan-modules"
@@ -359,6 +360,9 @@ var stringFlags = map[string]stringFlag{
 	},
 	RedisPassword: {
 		description: "The Redis Password for when using a Locking DB type of 'redis'.",
+	},
+	AWSCustomEndpoint: {
+		description: "The custom endpoint for AWS API, e.g., for storing locks in DynamoDB. This does not affect terraform execution.",
 	},
 	DynamoDBTable: {
 		description: "The DynamoDB table for when using a Locking DB type of 'dynamodb'",

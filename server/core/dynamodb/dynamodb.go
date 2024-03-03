@@ -14,16 +14,46 @@
 package dynamodb
 
 import (
+	"context"
+	"github.com/pkg/errors"
+	"github.com/runatlantis/atlantis/server/core/dynamodb/entity"
 	"github.com/runatlantis/atlantis/server/events/command"
 	"github.com/runatlantis/atlantis/server/events/models"
 	"time"
 )
 
 type DynamoDb struct {
+	repository Repository
 }
 
-func New() *DynamoDb {
-	return &DynamoDb{}
+func New(tableName, customEndpoint string) *DynamoDb {
+	return &DynamoDb{
+		repository: newDefaultRepository(tableName, customEndpoint),
+	}
+}
+
+func (d DynamoDb) listAllLocks() ([]models.ProjectLock, error) {
+	ctx := context.Background()
+
+	allLocks := make([]models.ProjectLock, 0)
+	var lastKey LastKey
+
+	for {
+		results, lastKey, err := d.repository.List(ctx, entity.ELock, lastKey)
+		if err != nil {
+			return nil, errors.Wrap(err, "Could not load all project locks from DynamoDb.")
+		}
+
+		for _, res := range results {
+			allLocks = append(allLocks, entity.ToObject[models.ProjectLock](res))
+		}
+
+		if lastKey == nil {
+			break
+		}
+	}
+
+	return allLocks, nil
 }
 
 func (d DynamoDb) TryLock(lock models.ProjectLock) (bool, models.ProjectLock, error) {
@@ -37,8 +67,7 @@ func (d DynamoDb) Unlock(project models.Project, workspace string) (*models.Proj
 }
 
 func (d DynamoDb) List() ([]models.ProjectLock, error) {
-	//TODO implement me
-	panic("implement me")
+	return d.listAllLocks()
 }
 
 func (d DynamoDb) GetLock(project models.Project, workspace string) (*models.ProjectLock, error) {
@@ -83,5 +112,5 @@ func (d DynamoDb) UnlockCommand(cmdName command.Name) error {
 
 func (d DynamoDb) CheckCommandLock(cmdName command.Name) (*command.Lock, error) {
 	//TODO implement me
-	panic("implement me")
+	return nil, nil
 }
