@@ -7,7 +7,7 @@ import (
 type Kind int8
 
 const (
-	ELock Kind = iota
+	EProjectLock Kind = iota
 )
 
 type Entity struct {

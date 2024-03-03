@@ -39,7 +39,7 @@ func (d DynamoDb) listAllLocks() ([]models.ProjectLock, error) {
 	var lastKey LastKey
 
 	for {
-		results, lastKey, err := d.repository.List(ctx, entity.ELock, lastKey)
+		results, lastKey, err := d.repository.List(ctx, entity.EProjectLock, lastKey)
 		if err != nil {
 			return nil, errors.Wrap(err, "Could not load all project locks from DynamoDb.")
 		}
