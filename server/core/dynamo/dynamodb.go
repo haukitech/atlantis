@@ -106,12 +106,7 @@ func (d DynamoDb) UpdatePullWithResults(pull models.PullRequest, newResults []co
 func (d DynamoDb) LockCommand(cmdName command.Name, lockTime time.Time) (*command.Lock, error) {
 	ctx := context.Background()
 
-	lock := command.Lock{
-		CommandName: cmdName,
-		LockMetadata: command.LockMetadata{
-			UnixTime: lockTime.Unix(),
-		},
-	}
+	lock := d.newCommandLock(cmdName, lockTime)
 	ent := repository.NewEntityFromObject(
 		repository.ECommandLock,
 		cmdName.String(),
@@ -126,8 +121,14 @@ func (d DynamoDb) LockCommand(cmdName command.Name, lockTime time.Time) (*comman
 }
 
 func (d DynamoDb) UnlockCommand(cmdName command.Name) error {
-	//TODO implement me
-	panic("implement me")
+	ctx := context.Background()
+
+	err := d.repository.Delete(ctx, repository.ECommandLock, cmdName.String())
+	if err != nil {
+		return errors.Wrapf(err, "Could not unlock command %s", cmdName)
+	}
+
+	return nil
 }
 
 func (d DynamoDb) CheckCommandLock(cmdName command.Name) (*command.Lock, error) {
@@ -146,4 +147,13 @@ func (d DynamoDb) CheckCommandLock(cmdName command.Name) (*command.Lock, error) 
 	repository.UnmarshalObject(*ent, &lock)
 
 	return &lock, nil
+}
+
+func (d DynamoDb) newCommandLock(cmdName command.Name, lockTime time.Time) command.Lock {
+	return command.Lock{
+		CommandName: cmdName,
+		LockMetadata: command.LockMetadata{
+			UnixTime: lockTime.Unix(),
+		},
+	}
 }
