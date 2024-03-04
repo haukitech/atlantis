@@ -20,7 +20,7 @@ type LastKey = dynamoAttributes
 type Repository interface {
 	GetOne(ctx context.Context, kind Kind, uid string) (*Entity, bool, error)
 	List(ctx context.Context, kind Kind, startKey LastKey) ([]Entity, LastKey, error)
-	Persist(ctx context.Context, ent *Entity) error
+	Persist(ctx context.Context, ent Entity) error
 	Delete(ctx context.Context, kind Kind, uid string) error
 }
 
@@ -52,7 +52,7 @@ func (r repositoryImpl) GetOne(ctx context.Context, kind Kind, uid string) (*Ent
 		return nil, false, errors.Wrapf(err, "Encountered an error while querying an entity %s from DynamoDB", uid)
 	}
 
-	if out.Item != nil {
+	if out.Item == nil {
 		return nil, false, nil
 	}
 
@@ -94,8 +94,8 @@ func (r repositoryImpl) List(ctx context.Context, kind Kind, startKey LastKey) (
 	return results, out.LastEvaluatedKey, nil
 }
 
-func (r repositoryImpl) Persist(ctx context.Context, ent *Entity) error {
-	item, err := attributevalue.MarshalMap(*ent)
+func (r repositoryImpl) Persist(ctx context.Context, ent Entity) error {
+	item, err := attributevalue.MarshalMap(ent)
 	if err != nil {
 		return errors.Wrap(err, "Cannot marshal entity into the DynamoDB object")
 	}
@@ -140,6 +140,6 @@ func (r repositoryImpl) Delete(ctx context.Context, kind Kind, uid string) error
 func (r repositoryImpl) entitySearchKey(kind Kind, uid string) dynamoAttributes {
 	return dynamoAttributes{
 		keyPk: &types.AttributeValueMemberN{Value: kind.String()},
-		keySk: &types.AttributeValueMemberN{Value: typedString(kind, uid)},
+		keySk: &types.AttributeValueMemberS{Value: typedString(kind, uid)},
 	}
 }

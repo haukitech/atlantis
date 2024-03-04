@@ -45,7 +45,10 @@ func (d DynamoDb) listAllLocks() ([]models.ProjectLock, error) {
 		}
 
 		for _, res := range results {
-			allLocks = append(allLocks, repository.ToObject[models.ProjectLock](res))
+			var lock models.ProjectLock
+			repository.UnmarshalObject(res, &lock)
+
+			allLocks = append(allLocks, lock)
 		}
 
 		if lastKey == nil {
@@ -115,7 +118,7 @@ func (d DynamoDb) LockCommand(cmdName command.Name, lockTime time.Time) (*comman
 		lock,
 	)
 
-	if err := d.repository.Persist(ctx, &ent); err != nil {
+	if err := d.repository.Persist(ctx, ent); err != nil {
 		return nil, errors.Wrapf(err, "Could not lock command %s", cmdName)
 	}
 
@@ -128,6 +131,19 @@ func (d DynamoDb) UnlockCommand(cmdName command.Name) error {
 }
 
 func (d DynamoDb) CheckCommandLock(cmdName command.Name) (*command.Lock, error) {
-	//TODO implement me
-	return nil, nil
+	ctx := context.Background()
+
+	ent, found, err := d.repository.GetOne(ctx, repository.ECommandLock, cmdName.String())
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not check lock status for command %s", cmdName)
+	}
+
+	if !found {
+		return nil, nil
+	}
+
+	var lock command.Lock
+	repository.UnmarshalObject(*ent, &lock)
+
+	return &lock, nil
 }

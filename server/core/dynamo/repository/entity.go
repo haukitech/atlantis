@@ -22,11 +22,8 @@ type Entity struct {
 	Object string
 }
 
-func ToObject[T any](entity Entity) T {
-	var object T
-	_ = json.Unmarshal([]byte(entity.Object), &object)
-
-	return object
+func UnmarshalObject[T any](entity Entity, object *T) {
+	_ = json.Unmarshal([]byte(entity.Object), object)
 }
 
 func NewEntityFromObject(kind Kind, uid string, object any) Entity {
