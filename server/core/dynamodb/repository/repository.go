@@ -1,4 +1,4 @@
-package dynamodb
+package repository
 
 import (
 	"context"
@@ -30,7 +30,7 @@ type repositoryImpl struct {
 	customEndpoint string
 }
 
-func newDefaultRepository(tableName, customEndpoint string) *repositoryImpl {
+func New(tableName, customEndpoint string) *repositoryImpl {
 	return &repositoryImpl{
 		tableName:      tableName,
 		customEndpoint: customEndpoint,

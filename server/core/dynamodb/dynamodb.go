@@ -17,18 +17,19 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"github.com/runatlantis/atlantis/server/core/dynamodb/entity"
+	"github.com/runatlantis/atlantis/server/core/dynamodb/repository"
 	"github.com/runatlantis/atlantis/server/events/command"
 	"github.com/runatlantis/atlantis/server/events/models"
 	"time"
 )
 
 type DynamoDb struct {
-	repository Repository
+	repository repository.Repository
 }
 
 func New(tableName, customEndpoint string) *DynamoDb {
 	return &DynamoDb{
-		repository: newDefaultRepository(tableName, customEndpoint),
+		repository: repository.New(tableName, customEndpoint),
 	}
 }
 
@@ -36,7 +37,7 @@ func (d DynamoDb) listAllLocks() ([]models.ProjectLock, error) {
 	ctx := context.Background()
 
 	allLocks := make([]models.ProjectLock, 0)
-	var lastKey LastKey
+	var lastKey repository.LastKey
 
 	for {
 		results, lastKey, err := d.repository.List(ctx, entity.EProjectLock, lastKey)
