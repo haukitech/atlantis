@@ -7,15 +7,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/pkg/errors"
-	"github.com/runatlantis/atlantis/server/core/dynamodb/entity"
 )
+
+func typedString(kind Kind, value string) string {
+	return fmt.Sprintf("%d_%s", kind, value)
+}
 
 func ptr[T any](value T) *T {
 	return &value
-}
-
-func typedString(kind entity.Kind, value string) string {
-	return fmt.Sprintf("%d_%s", kind, value)
 }
 
 func getDynamoDbClient(ctx context.Context, awsEndpoint string) (*dynamodb.Client, error) {

@@ -207,7 +207,7 @@ func TestClient_MergePullDeleteSourceBranch(t *testing.T) {
 		case "/rest/api/1.0/projects/ow/repos/repo/pull-requests/1/merge?version=3":
 			Equals(t, "POST", r.Method)
 			w.Write(pullRequest) // nolint: errcheck
-		case "/rest/branch-utils/1.0/projects/ow/repos/repo/branches":
+		case "/rest/branch-utils.go/1.0/projects/ow/repos/repo/branches":
 			Equals(t, "DELETE", r.Method)
 			defer r.Body.Close()
 			b, err := io.ReadAll(r.Body)

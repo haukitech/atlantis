@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/pkg/errors"
-	"github.com/runatlantis/atlantis/server/core/dynamodb/entity"
 )
 
 const (
@@ -19,10 +18,10 @@ type dynamoAttributes = map[string]types.AttributeValue
 type LastKey = dynamoAttributes
 
 type Repository interface {
-	GetOne(ctx context.Context, kind entity.Kind, uid string) (*entity.Entity, bool, error)
-	List(ctx context.Context, kind entity.Kind, startKey LastKey) ([]entity.Entity, LastKey, error)
-	Persist(ctx context.Context, ent entity.Entity) error
-	Delete(ctx context.Context, kind entity.Kind, uid string) error
+	GetOne(ctx context.Context, kind Kind, uid string) (*Entity, bool, error)
+	List(ctx context.Context, kind Kind, startKey LastKey) ([]Entity, LastKey, error)
+	Persist(ctx context.Context, ent Entity) error
+	Delete(ctx context.Context, kind Kind, uid string) error
 }
 
 type repositoryImpl struct {
@@ -37,7 +36,7 @@ func New(tableName, customEndpoint string) *repositoryImpl {
 	}
 }
 
-func (r repositoryImpl) GetOne(ctx context.Context, kind entity.Kind, uid string) (*entity.Entity, bool, error) {
+func (r repositoryImpl) GetOne(ctx context.Context, kind Kind, uid string) (*Entity, bool, error) {
 	client, err := getDynamoDbClient(ctx, r.customEndpoint)
 	if err != nil {
 		return nil, false, errors.Wrap(err, "Encountered an error while configuring DynamoDB client.")
@@ -57,7 +56,7 @@ func (r repositoryImpl) GetOne(ctx context.Context, kind entity.Kind, uid string
 		return nil, false, nil
 	}
 
-	var ent entity.Entity
+	var ent Entity
 	if err := attributevalue.UnmarshalMap(out.Item, &ent); err != nil {
 		return nil, true, errors.Wrap(err, "Cannot unmarshal DynamoDB object")
 	}
@@ -65,7 +64,7 @@ func (r repositoryImpl) GetOne(ctx context.Context, kind entity.Kind, uid string
 	return &ent, true, nil
 }
 
-func (r repositoryImpl) List(ctx context.Context, kind entity.Kind, startKey LastKey) ([]entity.Entity, LastKey, error) {
+func (r repositoryImpl) List(ctx context.Context, kind Kind, startKey LastKey) ([]Entity, LastKey, error) {
 	expr, _ := expression.NewBuilder().
 		WithKeyCondition(expression.Key(keyPk).Equal(expression.Value(kind))).
 		Build()
@@ -87,20 +86,20 @@ func (r repositoryImpl) List(ctx context.Context, kind entity.Kind, startKey Las
 		return nil, nil, errors.Wrap(err, "Encountered an error while querying a list of entities from DynamoDB")
 	}
 
-	var results []entity.Entity
+	var results []Entity
 	if err = attributevalue.UnmarshalListOfMaps(out.Items, &results); err != nil {
-		return nil, nil, errors.Wrap(err, "Cannot unmarshal dynamodb object")
+		return nil, nil, errors.Wrap(err, "Cannot unmarshal dynamo object")
 	}
 
 	return results, out.LastEvaluatedKey, nil
 }
 
-func (r repositoryImpl) Persist(ctx context.Context, ent entity.Entity) error {
+func (r repositoryImpl) Persist(ctx context.Context, ent Entity) error {
 	item, err := attributevalue.MarshalMap(ent)
 	if err != nil {
 		return errors.Wrap(err, "Cannot marshal entity into the DynamoDB object")
-
 	}
+
 	client, err := getDynamoDbClient(ctx, r.customEndpoint)
 	if err != nil {
 		return errors.Wrap(err, "Encountered an error while configuring DynamoDB client.")
@@ -118,7 +117,7 @@ func (r repositoryImpl) Persist(ctx context.Context, ent entity.Entity) error {
 	return nil
 }
 
-func (r repositoryImpl) Delete(ctx context.Context, kind entity.Kind, uid string) error {
+func (r repositoryImpl) Delete(ctx context.Context, kind Kind, uid string) error {
 	client, err := getDynamoDbClient(ctx, r.customEndpoint)
 	if err != nil {
 		return errors.Wrap(err, "Encountered an error while configuring DynamoDB client.")
@@ -138,7 +137,7 @@ func (r repositoryImpl) Delete(ctx context.Context, kind entity.Kind, uid string
 	return err
 }
 
-func (r repositoryImpl) entitySearchKey(kind entity.Kind, uid string) dynamoAttributes {
+func (r repositoryImpl) entitySearchKey(kind Kind, uid string) dynamoAttributes {
 	return dynamoAttributes{
 		keyPk: &types.AttributeValueMemberN{Value: kind.String()},
 		keySk: &types.AttributeValueMemberN{Value: typedString(kind, uid)},

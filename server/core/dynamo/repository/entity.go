@@ -1,8 +1,13 @@
-package entity
+package repository
 
 import (
 	"encoding/json"
 	"fmt"
+)
+
+const (
+	EProjectLock Kind = iota
+	ECommandLock
 )
 
 type Kind int8
@@ -10,10 +15,6 @@ type Kind int8
 func (k Kind) String() string {
 	return fmt.Sprintf("%d", k)
 }
-
-const (
-	EProjectLock Kind = iota
-)
 
 type Entity struct {
 	Pk     Kind
@@ -28,12 +29,12 @@ func ToObject[T any](entity Entity) T {
 	return object
 }
 
-func NewFromObject[T any](kind Kind, uid string, object T) Entity {
+func NewEntityFromObject(kind Kind, uid string, object any) Entity {
 	marshaled, _ := json.Marshal(object)
 
 	return Entity{
 		Pk:     kind,
-		Sk:     uid,
+		Sk:     typedString(kind, uid),
 		Object: string(marshaled),
 	}
 }

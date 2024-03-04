@@ -21,7 +21,7 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"github.com/runatlantis/atlantis/server/core/dynamodb"
+	"github.com/runatlantis/atlantis/server/core/dynamo"
 	"io"
 	"log"
 	"net/http"
@@ -442,9 +442,9 @@ func NewServer(userConfig UserConfig, config Config) (*Server, error) {
 		if err != nil {
 			return nil, err
 		}
-	case "dynamodb":
+	case "dynamo":
 		logger.Info("Utilizing DynamoDB")
-		backend = dynamodb.New(userConfig.DynamoDBTable, userConfig.AWSCustomEndpoint)
+		backend = dynamo.New(userConfig.DynamoDBTable, userConfig.AWSCustomEndpoint)
 	case "boltdb":
 		logger.Info("Utilizing BoltDB")
 		backend, err = db.New(userConfig.DataDir)

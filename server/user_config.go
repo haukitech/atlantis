@@ -40,7 +40,7 @@ type UserConfig struct {
 	DisableGlobalApplyLock      bool   `mapstructure:"disable-global-apply-lock"`
 	DisableUnlockLabel          string `mapstructure:"disable-unlock-label"`
 	DiscardApprovalOnPlanFlag   bool   `mapstructure:"discard-approval-on-plan"`
-	DynamoDBTable               string `mapstructure:"dynamodb-table"`
+	DynamoDBTable               string `mapstructure:"dynamo-table"`
 	EmojiReaction               string `mapstructure:"emoji-reaction"`
 	EnablePolicyChecksFlag      bool   `mapstructure:"enable-policy-checks"`
 	EnableRegExpCmd             bool   `mapstructure:"enable-regexp-cmd"`

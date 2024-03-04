@@ -418,7 +418,7 @@ This option does not affect terraform execution.
 
 ### `--dynamodb-table`
   ```bash
-  atlantis server --dynamodb-table=atlantis
+  atlantis server --dynamo-table=atlantis
   # or
   ATLANTIS_DYNAMODB_TABLE="atlantis"
   ```

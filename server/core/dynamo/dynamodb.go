@@ -11,13 +11,12 @@
 // limitations under the License.
 // Modified hereafter by contributors to runatlantis/atlantis.
 
-package dynamodb
+package dynamo
 
 import (
 	"context"
 	"github.com/pkg/errors"
-	"github.com/runatlantis/atlantis/server/core/dynamodb/entity"
-	"github.com/runatlantis/atlantis/server/core/dynamodb/repository"
+	"github.com/runatlantis/atlantis/server/core/dynamo/repository"
 	"github.com/runatlantis/atlantis/server/events/command"
 	"github.com/runatlantis/atlantis/server/events/models"
 	"time"
@@ -40,13 +39,13 @@ func (d DynamoDb) listAllLocks() ([]models.ProjectLock, error) {
 	var lastKey repository.LastKey
 
 	for {
-		results, lastKey, err := d.repository.List(ctx, entity.EProjectLock, lastKey)
+		results, lastKey, err := d.repository.List(ctx, repository.EProjectLock, lastKey)
 		if err != nil {
 			return nil, errors.Wrap(err, "Could not load all project locks from DynamoDb.")
 		}
 
 		for _, res := range results {
-			allLocks = append(allLocks, entity.ToObject[models.ProjectLock](res))
+			allLocks = append(allLocks, repository.ToObject[models.ProjectLock](res))
 		}
 
 		if lastKey == nil {
@@ -102,8 +101,13 @@ func (d DynamoDb) UpdatePullWithResults(pull models.PullRequest, newResults []co
 }
 
 func (d DynamoDb) LockCommand(cmdName command.Name, lockTime time.Time) (*command.Lock, error) {
-	//TODO implement me
-	panic("implement me")
+	//lock := command.Lock{
+	//	CommandName: cmdName,
+	//	LockMetadata: command.LockMetadata{
+	//		UnixTime: lockTime.Unix(),
+	//	},
+	//}
+	return nil, nil
 }
 
 func (d DynamoDb) UnlockCommand(cmdName command.Name) error {

@@ -1,6 +1,6 @@
 import { googleAnalyticsPlugin } from '@vuepress/plugin-google-analytics'
 import { docsearchPlugin } from '@vuepress/plugin-docsearch'
-import { getDirname, path } from '@vuepress/utils'
+import { getDirname, path } from '@vuepress/utils.go'
 import { defaultTheme, defineUserConfig } from 'vuepress'
 import { sitemapPlugin } from 'vuepress-plugin-sitemap2';
 
