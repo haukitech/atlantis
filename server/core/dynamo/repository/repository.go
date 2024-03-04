@@ -88,7 +88,7 @@ func (r repositoryImpl) List(ctx context.Context, kind Kind, startKey LastKey) (
 
 	var results []Entity
 	if err = attributevalue.UnmarshalListOfMaps(out.Items, &results); err != nil {
-		return nil, nil, errors.Wrap(err, "Cannot unmarshal dynamo object")
+		return nil, nil, errors.Wrap(err, "Cannot unmarshal DynamoDB object")
 	}
 
 	return results, out.LastEvaluatedKey, nil

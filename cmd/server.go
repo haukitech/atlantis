@@ -365,7 +365,7 @@ var stringFlags = map[string]stringFlag{
 		description: "The custom endpoint for AWS API, e.g., for storing locks in DynamoDB. This does not affect terraform execution.",
 	},
 	DynamoDBTable: {
-		description: "The DynamoDB table for when using a Locking DB type of 'dynamo'",
+		description: "The DynamoDB table for when using a Locking DB type of 'dynamodb'",
 	},
 	RepoConfigFlag: {
 		description: "Path to a repo config file, used to customize how Atlantis runs on each repo. See runatlantis.io/docs for more details.",
