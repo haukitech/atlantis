@@ -442,7 +442,7 @@ func NewServer(userConfig UserConfig, config Config) (*Server, error) {
 		if err != nil {
 			return nil, err
 		}
-	case "dynamo":
+	case "dynamodb":
 		logger.Info("Utilizing DynamoDB")
 		backend = dynamo.New(userConfig.DynamoDBTable, userConfig.AWSCustomEndpoint)
 	case "boltdb":

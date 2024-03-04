@@ -101,13 +101,25 @@ func (d DynamoDb) UpdatePullWithResults(pull models.PullRequest, newResults []co
 }
 
 func (d DynamoDb) LockCommand(cmdName command.Name, lockTime time.Time) (*command.Lock, error) {
-	//lock := command.Lock{
-	//	CommandName: cmdName,
-	//	LockMetadata: command.LockMetadata{
-	//		UnixTime: lockTime.Unix(),
-	//	},
-	//}
-	return nil, nil
+	ctx := context.Background()
+
+	lock := command.Lock{
+		CommandName: cmdName,
+		LockMetadata: command.LockMetadata{
+			UnixTime: lockTime.Unix(),
+		},
+	}
+	ent := repository.NewEntityFromObject(
+		repository.ECommandLock,
+		cmdName.String(),
+		lock,
+	)
+
+	if err := d.repository.Persist(ctx, &ent); err != nil {
+		return nil, errors.Wrapf(err, "Could not lock command %s", cmdName)
+	}
+
+	return &lock, nil
 }
 
 func (d DynamoDb) UnlockCommand(cmdName command.Name) error {

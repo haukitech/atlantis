@@ -76,7 +76,7 @@ const (
 	DisableGlobalApplyLockFlag       = "disable-global-apply-lock"
 	DisableUnlockLabelFlag           = "disable-unlock-label"
 	DiscardApprovalOnPlanFlag        = "discard-approval-on-plan"
-	DynamoDBTable                    = "dynamo-table"
+	DynamoDBTable                    = "dynamodb-table"
 	EmojiReaction                    = "emoji-reaction"
 	EnablePolicyChecksFlag           = "enable-policy-checks"
 	EnableRegExpCmdFlag              = "enable-regexp-cmd"

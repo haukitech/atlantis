@@ -20,7 +20,7 @@ type LastKey = dynamoAttributes
 type Repository interface {
 	GetOne(ctx context.Context, kind Kind, uid string) (*Entity, bool, error)
 	List(ctx context.Context, kind Kind, startKey LastKey) ([]Entity, LastKey, error)
-	Persist(ctx context.Context, ent Entity) error
+	Persist(ctx context.Context, ent *Entity) error
 	Delete(ctx context.Context, kind Kind, uid string) error
 }
 
@@ -94,8 +94,8 @@ func (r repositoryImpl) List(ctx context.Context, kind Kind, startKey LastKey) (
 	return results, out.LastEvaluatedKey, nil
 }
 
-func (r repositoryImpl) Persist(ctx context.Context, ent Entity) error {
-	item, err := attributevalue.MarshalMap(ent)
+func (r repositoryImpl) Persist(ctx context.Context, ent *Entity) error {
+	item, err := attributevalue.MarshalMap(*ent)
 	if err != nil {
 		return errors.Wrap(err, "Cannot marshal entity into the DynamoDB object")
 	}
