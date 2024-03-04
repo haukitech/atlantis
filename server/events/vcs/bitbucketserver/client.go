@@ -290,7 +290,7 @@ func (b *Client) MergePull(logger logging.SimpleLogging, pull models.PullRequest
 			return errors.Wrap(err, "json encoding")
 		}
 
-		path = fmt.Sprintf("%s/rest/branch-utils.go/1.0/projects/%s/repos/%s/branches", b.BaseURL, projectKey, pull.BaseRepo.Name)
+		path = fmt.Sprintf("%s/rest/branch-utils/1.0/projects/%s/repos/%s/branches", b.BaseURL, projectKey, pull.BaseRepo.Name)
 		_, err = b.makeRequest("DELETE", path, bytes.NewBuffer(bodyBytes))
 		if err != nil {
 			return err
