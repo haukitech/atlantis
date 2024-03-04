@@ -2,9 +2,14 @@ package entity
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type Kind int8
+
+func (k Kind) String() string {
+	return fmt.Sprintf("%d", k)
+}
 
 const (
 	EProjectLock Kind = iota

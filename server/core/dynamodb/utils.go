@@ -10,6 +10,10 @@ import (
 	"github.com/runatlantis/atlantis/server/core/dynamodb/entity"
 )
 
+func ptr[T any](value T) *T {
+	return &value
+}
+
 func typedString(kind entity.Kind, value string) string {
 	return fmt.Sprintf("%d_%s", kind, value)
 }

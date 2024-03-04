@@ -2,7 +2,6 @@ package dynamodb
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -16,13 +15,14 @@ const (
 	keySk = "Sk"
 )
 
-type LastKey = map[string]types.AttributeValue
+type dynamoAttributes = map[string]types.AttributeValue
+type LastKey = dynamoAttributes
 
 type Repository interface {
 	GetOne(ctx context.Context, kind entity.Kind, uid string) (*entity.Entity, bool, error)
 	List(ctx context.Context, kind entity.Kind, startKey LastKey) ([]entity.Entity, LastKey, error)
 	Persist(ctx context.Context, ent entity.Entity) error
-	Delete(ctx context.Context, ent entity.Entity) error
+	Delete(ctx context.Context, kind entity.Kind, uid string) error
 }
 
 type repositoryImpl struct {
@@ -53,7 +53,7 @@ func (r repositoryImpl) GetOne(ctx context.Context, kind entity.Kind, uid string
 	out, err := client.GetItem(
 		ctx,
 		&dynamodb.GetItemInput{
-			TableName: aws.String(r.tableName),
+			TableName: ptr(r.tableName),
 			Key:       expr.Values(),
 		},
 	)
@@ -84,14 +84,14 @@ func (r repositoryImpl) List(ctx context.Context, kind entity.Kind, startKey Las
 		return nil, nil, errors.Wrap(err, "Encountered an error while configuring DynamoDB client.")
 	}
 
-	query := dynamodb.QueryInput{
-		TableName:                 aws.String(r.tableName),
+	request := dynamodb.QueryInput{
+		TableName:                 ptr(r.tableName),
 		ExclusiveStartKey:         startKey,
 		KeyConditionExpression:    expr.KeyCondition(),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
 	}
-	out, err := client.Query(ctx, &query)
+	out, err := client.Query(ctx, &request)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "Encountered an error while querying a list of entities from DynamoDB")
 	}
@@ -105,11 +105,28 @@ func (r repositoryImpl) List(ctx context.Context, kind entity.Kind, startKey Las
 }
 
 func (r repositoryImpl) Persist(ctx context.Context, ent entity.Entity) error {
-	//TODO implement me
-	panic("implement me")
+	panic("Implement me")
 }
 
-func (r repositoryImpl) Delete(ctx context.Context, ent entity.Entity) error {
-	//TODO implement me
-	panic("implement me")
+func (r repositoryImpl) Delete(ctx context.Context, kind entity.Kind, uid string) error {
+	client, err := getDynamoDbClient(ctx, r.customEndpoint)
+	if err != nil {
+		return errors.Wrap(err, "Encountered an error while configuring DynamoDB client.")
+	}
+
+	key := dynamoAttributes{
+		keyPk: &types.AttributeValueMemberN{Value: kind.String()},
+		keySk: &types.AttributeValueMemberN{Value: typedString(kind, uid)},
+	}
+
+	request := dynamodb.DeleteItemInput{
+		TableName: ptr(r.tableName),
+		Key:       key,
+	}
+
+	if _, err = client.DeleteItem(ctx, &request); err != nil {
+		return errors.Wrap(err, "Encountered an error while deleting an entity from DynamoDB")
+	}
+
+	return err
 }
