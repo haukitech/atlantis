@@ -32,33 +32,6 @@ func New(tableName, customEndpoint string) *DynamoDb {
 	}
 }
 
-func (d DynamoDb) listAllLocks() ([]models.ProjectLock, error) {
-	ctx := context.Background()
-
-	allLocks := make([]models.ProjectLock, 0)
-	var lastKey repository.LastKey
-
-	for {
-		results, lastKey, err := d.repository.List(ctx, repository.EProjectLock, lastKey)
-		if err != nil {
-			return nil, errors.Wrap(err, "Could not load all project locks from DynamoDb.")
-		}
-
-		for _, res := range results {
-			var lock models.ProjectLock
-			repository.UnmarshalObject(res, &lock)
-
-			allLocks = append(allLocks, lock)
-		}
-
-		if lastKey == nil {
-			break
-		}
-	}
-
-	return allLocks, nil
-}
-
 func (d DynamoDb) TryLock(lock models.ProjectLock) (bool, models.ProjectLock, error) {
 	//TODO implement me
 	panic("implement me")
@@ -156,4 +129,31 @@ func (d DynamoDb) newCommandLock(cmdName command.Name, lockTime time.Time) comma
 			UnixTime: lockTime.Unix(),
 		},
 	}
+}
+
+func (d DynamoDb) listAllLocks() ([]models.ProjectLock, error) {
+	ctx := context.Background()
+
+	allLocks := make([]models.ProjectLock, 0)
+	var lastKey repository.LastKey
+
+	for {
+		results, lastKey, err := d.repository.List(ctx, repository.EProjectLock, lastKey)
+		if err != nil {
+			return nil, errors.Wrap(err, "Could not load all project locks from DynamoDb.")
+		}
+
+		for _, res := range results {
+			var lock models.ProjectLock
+			repository.UnmarshalObject(res, &lock)
+
+			allLocks = append(allLocks, lock)
+		}
+
+		if lastKey == nil {
+			break
+		}
+	}
+
+	return allLocks, nil
 }
