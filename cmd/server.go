@@ -53,6 +53,7 @@ const (
 	AtlantisURLFlag                  = "atlantis-url"
 	AutoDiscoverModeFlag             = "autodiscover-mode"
 	AutomergeFlag                    = "automerge"
+	AWSCustomEndpoint                = "aws-custom-endpoint"
 	ParallelPlanFlag                 = "parallel-plan"
 	ParallelApplyFlag                = "parallel-apply"
 	AutoplanModules                  = "autoplan-modules"
@@ -75,6 +76,7 @@ const (
 	DisableGlobalApplyLockFlag       = "disable-global-apply-lock"
 	DisableUnlockLabelFlag           = "disable-unlock-label"
 	DiscardApprovalOnPlanFlag        = "discard-approval-on-plan"
+	DynamoDBTable                    = "dynamodb-table"
 	EmojiReaction                    = "emoji-reaction"
 	EnablePolicyChecksFlag           = "enable-policy-checks"
 	EnableRegExpCmdFlag              = "enable-regexp-cmd"
@@ -358,6 +360,12 @@ var stringFlags = map[string]stringFlag{
 	},
 	RedisPassword: {
 		description: "The Redis Password for when using a Locking DB type of 'redis'.",
+	},
+	AWSCustomEndpoint: {
+		description: "The custom endpoint for AWS API, e.g., for storing locks in DynamoDB. This does not affect terraform execution.",
+	},
+	DynamoDBTable: {
+		description: "The DynamoDB table for when using a Locking DB type of 'dynamodb'",
 	},
 	RepoConfigFlag: {
 		description: "Path to a repo config file, used to customize how Atlantis runs on each repo. See runatlantis.io/docs for more details.",

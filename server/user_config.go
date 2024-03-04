@@ -19,6 +19,7 @@ type UserConfig struct {
 	AutoplanFileList            string `mapstructure:"autoplan-file-list"`
 	AutoplanModules             bool   `mapstructure:"autoplan-modules"`
 	AutoplanModulesFromProjects string `mapstructure:"autoplan-modules-from-projects"`
+	AWSCustomEndpoint           string `mapstructure:"aws-custom-endpoint"`
 	AzureDevopsToken            string `mapstructure:"azuredevops-token"`
 	AzureDevopsUser             string `mapstructure:"azuredevops-user"`
 	AzureDevopsWebhookPassword  string `mapstructure:"azuredevops-webhook-password"`
@@ -39,6 +40,7 @@ type UserConfig struct {
 	DisableGlobalApplyLock      bool   `mapstructure:"disable-global-apply-lock"`
 	DisableUnlockLabel          string `mapstructure:"disable-unlock-label"`
 	DiscardApprovalOnPlanFlag   bool   `mapstructure:"discard-approval-on-plan"`
+	DynamoDBTable               string `mapstructure:"dynamodb-table"`
 	EmojiReaction               string `mapstructure:"emoji-reaction"`
 	EnablePolicyChecksFlag      bool   `mapstructure:"enable-policy-checks"`
 	EnableRegExpCmd             bool   `mapstructure:"enable-regexp-cmd"`

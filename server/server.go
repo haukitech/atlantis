@@ -41,6 +41,7 @@ import (
 	cfg "github.com/runatlantis/atlantis/server/core/config"
 	"github.com/runatlantis/atlantis/server/core/config/valid"
 	"github.com/runatlantis/atlantis/server/core/db"
+	"github.com/runatlantis/atlantis/server/core/dynamo"
 	"github.com/runatlantis/atlantis/server/core/redis"
 	"github.com/runatlantis/atlantis/server/jobs"
 	"github.com/runatlantis/atlantis/server/metrics"
@@ -441,6 +442,9 @@ func NewServer(userConfig UserConfig, config Config) (*Server, error) {
 		if err != nil {
 			return nil, err
 		}
+	case "dynamodb":
+		logger.Info("Utilizing DynamoDB")
+		backend = dynamo.New(userConfig.DynamoDBTable, userConfig.AWSCustomEndpoint)
 	case "boltdb":
 		logger.Info("Utilizing BoltDB")
 		backend, err = db.New(userConfig.DataDir)
