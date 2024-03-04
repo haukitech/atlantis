@@ -38,25 +38,16 @@ func newDefaultRepository(tableName, customEndpoint string) *repositoryImpl {
 }
 
 func (r repositoryImpl) GetOne(ctx context.Context, kind entity.Kind, uid string) (*entity.Entity, bool, error) {
-	typedUid := typedString(kind, uid)
-
-	expr, _ := expression.NewBuilder().
-		WithKeyCondition(expression.Key(keyPk).Equal(expression.Value(kind))).
-		WithKeyCondition(expression.Key(keySk).Equal(expression.Value(typedUid))).
-		Build()
-
 	client, err := getDynamoDbClient(ctx, r.customEndpoint)
 	if err != nil {
 		return nil, false, errors.Wrap(err, "Encountered an error while configuring DynamoDB client.")
 	}
 
-	out, err := client.GetItem(
-		ctx,
-		&dynamodb.GetItemInput{
-			TableName: ptr(r.tableName),
-			Key:       expr.Values(),
-		},
-	)
+	input := dynamodb.GetItemInput{
+		TableName: ptr(r.tableName),
+		Key:       r.entitySearchKey(kind, uid),
+	}
+	out, err := client.GetItem(ctx, &input)
 
 	if err != nil {
 		return nil, false, errors.Wrapf(err, "Encountered an error while querying an entity %s from DynamoDB", uid)
@@ -105,7 +96,26 @@ func (r repositoryImpl) List(ctx context.Context, kind entity.Kind, startKey Las
 }
 
 func (r repositoryImpl) Persist(ctx context.Context, ent entity.Entity) error {
-	panic("Implement me")
+	item, err := attributevalue.MarshalMap(ent)
+	if err != nil {
+		return errors.Wrap(err, "Cannot marshal entity into the DynamoDB object")
+
+	}
+	client, err := getDynamoDbClient(ctx, r.customEndpoint)
+	if err != nil {
+		return errors.Wrap(err, "Encountered an error while configuring DynamoDB client.")
+	}
+
+	input := dynamodb.PutItemInput{
+		TableName: ptr(r.tableName),
+		Item:      item,
+	}
+
+	if _, err := client.PutItem(ctx, &input); err != nil {
+		return errors.Wrap(err, "Encountered an error while putting an entity to DynamoDB")
+	}
+
+	return nil
 }
 
 func (r repositoryImpl) Delete(ctx context.Context, kind entity.Kind, uid string) error {
@@ -114,10 +124,7 @@ func (r repositoryImpl) Delete(ctx context.Context, kind entity.Kind, uid string
 		return errors.Wrap(err, "Encountered an error while configuring DynamoDB client.")
 	}
 
-	key := dynamoAttributes{
-		keyPk: &types.AttributeValueMemberN{Value: kind.String()},
-		keySk: &types.AttributeValueMemberN{Value: typedString(kind, uid)},
-	}
+	key := r.entitySearchKey(kind, uid)
 
 	request := dynamodb.DeleteItemInput{
 		TableName: ptr(r.tableName),
@@ -129,4 +136,11 @@ func (r repositoryImpl) Delete(ctx context.Context, kind entity.Kind, uid string
 	}
 
 	return err
+}
+
+func (r repositoryImpl) entitySearchKey(kind entity.Kind, uid string) dynamoAttributes {
+	return dynamoAttributes{
+		keyPk: &types.AttributeValueMemberN{Value: kind.String()},
+		keySk: &types.AttributeValueMemberN{Value: typedString(kind, uid)},
+	}
 }
